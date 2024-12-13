@@ -10,26 +10,24 @@ from monitors import Monitor
 from state import StageManager, State
 
 
-class RegisterFile(object):
-    def __init__(self, outPath: Path):
-        self.outputFile = outPath
-        self.Registers = [0x0 for _ in range(32)]
+class RegisterFile:
+    """Simulates a set of CPU registers."""
+    def __init__(self):
+        self.registers = [0] * 32  # Initialize 32 registers with 0
 
-    def readRF(self, Reg_addr: int):
-        return self.Registers[Reg_addr]
+    def read(self, index):
+        """Reads the value of the register at a given index."""
+        return self.registers[index]
 
-    def writeRF(self, Reg_addr: int, Wrt_reg_data: int):
-        self.Registers[Reg_addr] = Wrt_reg_data
+    def write(self, index, value):
+        """Writes a value to the register at a given index."""
+        if index != 0:  # Register 0 is always 0 in most architectures
+            self.registers[index] = value
 
-    def outputRF(self, cycle: int):
-        op = ["-" * 70 + "\n", f"State of RF after executing cycle: {cycle}\n"]
-        op.extend([f"{signed_int_to_binary_str(val)}\n" for val in self.Registers])
-        if cycle == 0:
-            perm = "w"
-        else:
-            perm = "a"
-        with open(self.outputFile, perm) as file:
-            file.writelines(op)
+    def dump(self):
+        """Prints the state of all registers."""
+        for i, val in enumerate(self.registers):
+            print(f"R{i}: {val}")
 
 
 class Core(object):
